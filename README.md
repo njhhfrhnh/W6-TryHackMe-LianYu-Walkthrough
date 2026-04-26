@@ -32,7 +32,7 @@ Explanation:
 
 The scan shows multiple services, but HTTP (port 80) is the best starting point because web applications often expose hidden directories or sensitive data.
 
-2. Scanning & Enumeration
+##2. Scanning & Enumeration
 
 Objective: Extract deeper information from identified services.
 
