@@ -21,6 +21,7 @@ Always start with an Nmap scan to discover open ports and services.
 
 ```bash
 nmap -sC -sV -Pn -T4 10.48.140.128
+```
 <img src="ADD_NMAP_SCREENSHOT" />
 Findings:
 Service	Port	What can be done (commands / next step)	Findings
@@ -31,6 +32,7 @@ RPC	111	Enumeration possible	Low priority
 Explanation:
 
 The scan shows multiple services, but HTTP (port 80) is the best starting point because web applications often expose hidden directories or sensitive data.
+
 
 ##2. Scanning & Enumeration
 
