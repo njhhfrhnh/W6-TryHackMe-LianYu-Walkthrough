@@ -83,6 +83,7 @@ gobuster dir -u http://10.48.140.128/island -w /usr/share/wordlists/dirbuster/di
 ```
 <img width="940" height="299" alt="image" src="https://github.com/user-attachments/assets/9980062d-5940-45eb-9014-261388cd219d" />
 This revealed another directory:
+
 ```bash
 /2100
 ```
@@ -97,7 +98,7 @@ http://10.48.140.128/island/2100
 <img width="840" height="344" alt="image" src="https://github.com/user-attachments/assets/92ac1318-6b04-4b2d-a0ea-9ddcd8cd933e" />
 
 
-"you can avail your .ticket here but how?"
+"you can avail your `.ticket` here but how?"
 
 This suggests that a hidden file exists, possibly with a specific extension.
 
@@ -119,10 +120,11 @@ I navigate to `/green_arrow.ticket` and found an encoded string:
 http://10.48.140.128/island/2100/green_arrow.ticket
 ```
 <img width="940" height="183" alt="image" src="https://github.com/user-attachments/assets/0c3f04ea-e775-4259-89b0-0b8261789b67" />
+
 ```bash
 RTy8yhBQdscX
 ```
-I tried to decode the hash using different base formats using cyberchef, and eventually discovered that Base58 decoding worked.
+I tried to decode the hash using different base formats using `cyberchef` , and eventually discovered that `Base58` decoding worked.
 <img width="898" height="510" alt="image" src="https://github.com/user-attachments/assets/9fa0a05d-fb9e-4082-bc48-2e431c010557" />
 
 After decoding, I obtained:
@@ -135,7 +137,7 @@ This appears to be a password, most likely for FTP.
 
 I attempted to log in to FTP using:
 
-Username: `vigilante` (from earlier clue)
+Username: `vigilante` 
 Password: `!#th3h00d`
 
 <img width="866" height="365" alt="image" src="https://github.com/user-attachments/assets/dc101cc6-ec9d-4919-af2a-91f13ab7f1da" />
@@ -159,6 +161,7 @@ ls -la
 ```
 <img width="816" height="294" alt="image" src="https://github.com/user-attachments/assets/e4b1dde3-d292-4593-8d2c-52032162ea0b" />
 Interestingly, I found a hidden file:
+
 `.other_user`
 
 I downloaded that as well:
@@ -177,9 +180,11 @@ cat .other_user
 <img width="940" height="670" alt="image" src="https://github.com/user-attachments/assets/f847c997-80cf-47eb-80ad-f0ae33ea3e92" />
 However, the key detail I was looking for was the name mentioned inside.
 From the content, I identified:
+
 ```bash
 Slade Wilson
 ```
+
 This is likely the SSH username, so I kept it for later.
 
 ### Investigating `Leave_me_alone.png`
