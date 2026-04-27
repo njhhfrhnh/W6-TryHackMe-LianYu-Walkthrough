@@ -23,7 +23,7 @@ nmap -sC -sV -Pn -T4 -oN nmap/lianyu 10.48.140.128
 -sC : Default scripts
 -sV : Version detection
 -p- : All ports to scan
--oN : Output to be stored in the directory ‘nmap’ you created earlier
+-oN : Output to be stored in the directory `nmap` you created earlier
 
 <img width="940" height="564" alt="image" src="https://github.com/user-attachments/assets/c3ddbfbe-7e42-437a-8daf-41147e47b10d" />
 
