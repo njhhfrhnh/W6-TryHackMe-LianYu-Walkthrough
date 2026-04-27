@@ -1,4 +1,5 @@
 # W6-TryHackMe-LianYu-Walkthrough
+Nur Najihah Farhanah binti Hashim (52215125111) L01-B05
 ## **Summary**
 
 | Phase                     | Action                                  | Outcome                                      |
