@@ -211,14 +211,19 @@ I suspected the file signature was incorrect. PNG files should start with:
 
 <img width="940" height="358" alt="image" src="https://github.com/user-attachments/assets/75537bcd-a489-404e-bfb0-b1234703249b" />
 
+
 After comparing, I noticed the signature was wrong. I corrected it and saved the file.
+
 <img width="714" height="139" alt="image" src="https://github.com/user-attachments/assets/02fd291f-084a-4bdd-a5c4-41a11a5fb02c" />
 
-After fixing, the image opened successfully and revealed the word:
+After fixing, the image opened successfully.
+<img width="940" height="734" alt="image" src="https://github.com/user-attachments/assets/71f53664-952c-4a51-b2c4-920bb4b6bf94" />
+
+The file revealed the word:
+
 ```bash
 password
 ```
-<img width="940" height="734" alt="image" src="https://github.com/user-attachments/assets/71f53664-952c-4a51-b2c4-920bb4b6bf94" />
 
 ### Extracting Hidden Data from aa.jpg
 
@@ -244,6 +249,7 @@ unzip ss.zip
 This gave me two files:
 
 passwd.txt
+
 shado
 
 I checked the shado file:
@@ -305,7 +311,7 @@ pkexec
 
 ### Exploiting pkexec
 
-I referred to `GTFOBins` and found that pkexec can be used to spawn a root shell.
+I referred to `GTFOBins` and found that `pkexec` can be used to spawn a root shell.
 <img width="940" height="587" alt="image" src="https://github.com/user-attachments/assets/1977e934-876e-4bbc-8121-01621b0c4c80" />
 
 So I run:
