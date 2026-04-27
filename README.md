@@ -36,6 +36,29 @@ nmap -sC -sV -Pn -T4 -oN nmap/lianyu 10.48.140.128
 
 The scan shows multiple services, but HTTP (port 80) is the best starting point because web applications often expose hidden directories or sensitive data.
 
+## **2. Scanning & Enumeration**
+
+**Objective:** Extract deeper information from identified services.
+
+### Access Website
+
+Since port 80 is open, I opened the target IP in the browser.
+
+```bash
+http://10.48.140.128
+```
+<img width="940" height="686" alt="image" src="https://github.com/user-attachments/assets/79997417-053d-4bab-af02-7df3c62a5080" />
+
+The website shows an Arrowverse-themed page. This confirms that the HTTP service is running properly and can be explored further.
+
+### Web Enumeration
+
+```bash
+gobuster dir -u http://10.48.140.128 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
+<img src="ADD_GOBUSTER_SCREENSHOT" />
+Discovered:
+/island
 
 
 
